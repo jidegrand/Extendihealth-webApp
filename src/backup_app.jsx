@@ -4365,6 +4365,36 @@ const Dashboard = ({ user, appointments, prescriptions, labResults, onNavigate, 
                 View Health Profile
               </Button>
             </Card>
+
+            {/* Find Kiosk Card */}
+            <Card className="p-6 bg-gradient-to-br from-cyan-500 to-teal-600 text-white relative overflow-hidden">
+              <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute right-8 bottom-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2" />
+              <div className="relative">
+                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
+                  <MapPin className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="font-bold text-xl mb-2">Find a Kiosk</h3>
+                <p className="text-cyan-100 text-sm mb-4">
+                  Locate nearby health kiosks with real-time wait times and available services.
+                </p>
+                <div className="flex items-center gap-2 text-sm text-cyan-100 mb-4">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full" />
+                    <span>{KIOSKS.filter(k => k.isOpen).length} Open Now</span>
+                  </div>
+                  <span>•</span>
+                  <span>{KIOSKS.length} Locations</span>
+                </div>
+                <button 
+                  onClick={onFindKiosk}
+                  className="w-full py-3 bg-white text-cyan-600 font-semibold rounded-xl hover:bg-cyan-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Navigation className="w-5 h-5" />
+                  Find Nearest Kiosk
+                </button>
+              </div>
+            </Card>
           </div>
         ) : (
           /* Mobile Layout */
@@ -4453,6 +4483,30 @@ const Dashboard = ({ user, appointments, prescriptions, labResults, onNavigate, 
                 </div>
               </Card>
             )}
+
+            {/* Find Kiosk Card - Mobile */}
+            <Card className="mb-4 overflow-hidden">
+              <div className="bg-gradient-to-r from-cyan-500 to-teal-600 p-4 text-white relative">
+                <div className="absolute right-0 top-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <div className="relative flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg">Find a Kiosk</h3>
+                    <p className="text-cyan-100 text-sm">{KIOSKS.filter(k => k.isOpen).length} kiosks open nearby</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/70" />
+                </div>
+              </div>
+              <button 
+                onClick={onFindKiosk}
+                className="w-full p-3 flex items-center justify-center gap-2 text-cyan-600 font-semibold hover:bg-cyan-50 transition-colors"
+              >
+                <Navigation className="w-4 h-4" />
+                Find Nearest Kiosk
+              </button>
+            </Card>
 
             {/* Quick Actions */}
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 mt-6">Quick Actions</h2>

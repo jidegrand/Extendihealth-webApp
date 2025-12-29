@@ -5,9 +5,6 @@ import { Heart, MapPin, Calendar, Clock, ChevronLeft, ChevronRight, Settings, Ho
 // IMPORTS FROM MODULAR FILES
 // ============================================================================
 
-// Context Providers
-import { RealtimeProvider } from './context';
-
 // Custom hooks
 import { useResponsive, useKeyboardShortcuts } from './hooks';
 
@@ -39,29 +36,12 @@ import {
   KioskCheckInPage,
   VirtualVisitPage,
   PlaceholderScreen,
-  ProfilePage,
-  ERorKioskPage,
-  LoginToBookPage,
-  PostVisitSummaryPage,
-  SendToPharmacyPage,
-  FindFamilyDoctorPage,
-  RescheduleAppointmentPage,
-  PharmacyPage,
-  LabResultsPage,
-  AppointmentsPage,
   // HIPAA-Compliant Intake Flow
   HIPAAConsentPage,
   MedicalHistoryPage,
   CurrentMedicationsPage,
   EnhancedSymptomsPage,
   EnhancedAIPreDiagnosisPage,
-  // Enhanced Features (Option A)
-  NotificationsPage,
-  MessagesPage,
-  BillingPage,
-  HealthRecordsPage,
-  FamilyAccessPage,
-  ShareRecordsPage,
 } from './components/pages';
 
 // Data & Constants
@@ -1063,7 +1043,6 @@ const AppShell = ({
           onSearch={() => setShowSearch(true)}
           onNotifications={() => onNavigate('notifications')}
           onSettings={() => onNavigate('settings')}
-          onProfile={() => onNavigate('profile')}
           onSignOut={onSignOut}
           screen={screen}
           bookingFlow={bookingFlow}
@@ -1160,7 +1139,6 @@ export default function ExtendiHealthApp() {
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [appointments, setAppointments] = useState([]);
-  const [rescheduleAppointment, setRescheduleAppointment] = useState(null);
   const [prescriptions, setPrescriptions] = useState([]);
   const [labResults, setLabResults] = useState([]);
   const [healthSummary, setHealthSummary] = useState(null);
@@ -1498,7 +1476,6 @@ export default function ExtendiHealthApp() {
             onSignIn={() => setScreen('login')}
             onFindKiosk={() => setScreen('kiosks')}
             onCheckWaitingRoom={() => setScreen('login')}
-            onERorKiosk={() => setScreen('erOrKiosk')}
           />
         );
       case 'login':
@@ -1649,17 +1626,6 @@ export default function ExtendiHealthApp() {
           <CareScreen
             onGetCareNow={() => startBookingFlow('getCareNow')}
             onBookAppointment={() => startBookingFlow('bookAppointment')}
-            onERorKiosk={() => setScreen('erOrKiosk')}
-          />
-        );
-      case 'erOrKiosk':
-        return (
-          <ERorKioskPage
-            onBack={() => setScreen(user ? 'care' : 'landing')}
-            onNavigate={handleNavigate}
-            user={user}
-            onSignIn={() => setScreen('login')}
-            onCreateAccount={() => setScreen('createAccount')}
           />
         );
       case 'getCareReason':
@@ -1741,29 +1707,15 @@ export default function ExtendiHealthApp() {
       case 'kiosks':
         return (
           <KiosksListPage
-            onBack={() => setScreen(user ? 'dashboard' : 'landing')}
+            onBack={() => setScreen('dashboard')}
             onSelectKiosk={(kiosk) => {
               setBookingFlow(prev => ({ ...prev, kiosk }));
               setScreen('kioskDetails');
             }}
             onBookSlot={(kiosk) => {
               setBookingFlow(prev => ({ ...prev, kiosk }));
-              // If not logged in, prompt to login/signup before booking
-              if (!user) {
-                setScreen('loginToBook');
-              } else {
-                setScreen('bookKioskVisit');
-              }
+              setScreen('bookKioskVisit');
             }}
-          />
-        );
-      case 'loginToBook':
-        return (
-          <LoginToBookPage
-            kiosk={bookingFlow.kiosk}
-            onBack={() => setScreen('kioskDetails')}
-            onSignIn={() => setScreen('login')}
-            onCreateAccount={() => setScreen('createAccount')}
           />
         );
       case 'kioskDetails':
@@ -1773,21 +1725,11 @@ export default function ExtendiHealthApp() {
             onBack={() => setScreen('kiosks')}
             onBookSlot={(kiosk) => {
               setBookingFlow(prev => ({ ...prev, kiosk }));
-              // If not logged in, prompt to login/signup before booking
-              if (!user) {
-                setScreen('loginToBook');
-              } else {
-                setScreen('bookKioskVisit');
-              }
+              setScreen('bookKioskVisit');
             }}
             onWalkIn={(kiosk) => {
               setBookingFlow(prev => ({ ...prev, kiosk }));
-              // If not logged in, prompt to login/signup before walk-in
-              if (!user) {
-                setScreen('loginToBook');
-              } else {
-                setScreen('kioskCheckIn');
-              }
+              setScreen('kioskCheckIn');
             }}
             onGetDirections={() => {
               // Would open maps app in real implementation
@@ -1880,25 +1822,28 @@ export default function ExtendiHealthApp() {
           />
         );
       case 'visitSummaryComplete':
-      case 'postVisitSummary':
         return (
-          <PostVisitSummaryPage
-            visit={bookingFlow.completedVisit}
-            onBack={() => setScreen('dashboard')}
-            onNavigate={handleNavigate}
-            onDownload={() => {
-              alert('Downloading visit summary PDF...');
-            }}
-            onShare={() => {
-              alert('Share options: Email, Print, or send to another provider');
-            }}
-            onScheduleFollowUp={() => {
-              setScreen('kiosks');
-            }}
-            onContactProvider={() => {
-              alert('Calling clinic: (416) 555-0123');
-            }}
-          />
+          <div className="min-h-screen bg-gray-50 p-4">
+            <div className="max-w-lg mx-auto space-y-6 text-center pt-8">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle className="w-10 h-10 text-green-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Visit Complete!</h1>
+              <p className="text-gray-500">Your visit summary will be available in your records shortly.</p>
+              <Card className="p-4 text-left">
+                <h3 className="font-semibold mb-3">What's Next?</h3>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-green-500" /> Visit summary sent to your email</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-green-500" /> Any prescriptions sent to your pharmacy</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-green-500" /> Lab orders (if any) sent to nearest lab</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-green-500" /> Follow-up appointment can be booked</li>
+                </ul>
+              </Card>
+              <Button size="lg" className="w-full" onClick={() => setScreen('dashboard')}>
+                Return to Dashboard
+              </Button>
+            </div>
+          </div>
         );
       case 'selectDateTime':
       case 'reviewAppointment':
@@ -1915,15 +1860,12 @@ export default function ExtendiHealthApp() {
               setWaitingRoom(null);
               setScreen('dashboard');
             }}
-            onCheckIn={(checkInNum) => {
-              // Handle check-in completion - state is updated in the component
-              createAuditLog('KIOSK_CHECK_IN', { 
-                kioskId: waitingRoom?.kiosk?.id,
-                checkInNumber: checkInNum 
-              }, user?.email);
+            onCheckIn={() => {
+              // Handle check-in completion
+              createAuditLog('KIOSK_CHECK_IN', { kioskId: waitingRoom?.kiosk?.id }, user?.email);
             }}
             onBackToHome={() => {
-              // Don't clear waitingRoom - preserve the checked-in status
+              setWaitingRoom(null);
               setScreen('dashboard');
             }}
           />
@@ -1950,14 +1892,11 @@ export default function ExtendiHealthApp() {
               setWaitingRoom(null);
               setScreen('dashboard');
             }}
-            onCheckIn={(checkInNum) => {
-              createAuditLog('KIOSK_CHECK_IN', { 
-                kioskId: waitingRoom?.kiosk?.id,
-                checkInNumber: checkInNum 
-              }, user?.email);
+            onCheckIn={() => {
+              createAuditLog('KIOSK_CHECK_IN', { kioskId: waitingRoom?.kiosk?.id }, user?.email);
             }}
             onBackToHome={() => {
-              // Don't clear waitingRoom - preserve the checked-in status
+              setWaitingRoom(null);
               setScreen('dashboard');
             }}
           />
@@ -1977,188 +1916,18 @@ export default function ExtendiHealthApp() {
           />
         );
       case 'checkIn':
-        return <PlaceholderScreen title={SCREEN_NAMES[screen] || screen} onBack={() => setScreen('dashboard')} />;
       case 'appointments':
-        return (
-          <AppointmentsPage
-            appointments={appointments}
-            onBack={() => setScreen('dashboard')}
-            onBookAppointment={() => startBookingFlow('bookAppointment')}
-            onJoinWaitingRoom={(apt) => {
-              setBookingFlow(prev => ({ 
-                ...prev, 
-                kiosk: { name: apt.location, address: apt.address },
-                getCareData: { symptoms: apt.reason, severity: 'Mild' }
-              }));
-              setWaitingRoom({
-                id: 'wr-' + Date.now(),
-                appointmentId: apt.id,
-                position: Math.floor(Math.random() * 3) + 1,
-                estimatedWait: Math.floor(Math.random() * 15) + 5,
-                status: 'waiting',
-                joinedAt: new Date().toISOString(),
-                kiosk: { name: apt.location, address: apt.address },
-                appointment: apt,
-              });
-              setScreen('waitingRoom');
-            }}
-            onCancelAppointment={(apt) => {
-              setAppointments(prev => prev.map(a => 
-                a.id === apt.id ? { ...a, status: 'Cancelled' } : a
-              ));
-            }}
-            onReschedule={(apt) => {
-              setRescheduleAppointment(apt);
-              setScreen('rescheduleAppointment');
-            }}
-          />
-        );
-      case 'rescheduleAppointment':
-        return (
-          <RescheduleAppointmentPage
-            appointment={rescheduleAppointment}
-            onBack={() => setScreen('appointments')}
-            onReschedule={(updatedApt) => {
-              setAppointments(prev => prev.map(a => 
-                a.id === updatedApt.id ? updatedApt : a
-              ));
-              setRescheduleAppointment(null);
-            }}
-            onNavigate={handleNavigate}
-          />
-        );
-      case 'sendToPharmacy':
-        return (
-          <SendToPharmacyPage
-            prescriptions={bookingFlow.completedVisit?.prescriptions}
-            preferredPharmacy={null}
-            onBack={() => setScreen('postVisitSummary')}
-            onNavigate={handleNavigate}
-            onComplete={() => {
-              setScreen('pharmacy');
-            }}
-          />
-        );
       case 'pharmacy':
-        return (
-          <PharmacyPage
-            prescriptions={prescriptions}
-            onBack={() => setScreen('dashboard')}
-            onRequestRefill={(rx) => {
-              createAuditLog('REFILL_REQUESTED', { prescriptionId: rx.id }, user?.email);
-              // In production, this would trigger a refill request
-            }}
-          />
-        );
       case 'labResults':
-        return (
-          <LabResultsPage
-            labResults={labResults}
-            onBack={() => setScreen('dashboard')}
-          />
-        );
-      case 'notifications':
-        return (
-          <NotificationsPage
-            notifications={[]}
-            onBack={() => setScreen('dashboard')}
-            onMarkAsRead={(id) => console.log('Mark read:', id)}
-            onDelete={(id) => console.log('Delete:', id)}
-            onNotificationClick={(notification) => {
-              if (notification.actionUrl) {
-                const screenMap = {
-                  '/appointments': 'appointments',
-                  '/pharmacy': 'pharmacy',
-                  '/lab-results': 'labResults',
-                  '/messages': 'messages',
-                  '/billing': 'billing',
-                  '/settings': 'settings'
-                };
-                const targetScreen = screenMap[notification.actionUrl];
-                if (targetScreen) setScreen(targetScreen);
-              }
-            }}
-          />
-        );
-      case 'messages':
-        return (
-          <MessagesPage
-            conversations={[]}
-            onBack={() => setScreen('dashboard')}
-            onSendMessage={(convId, message) => console.log('Send message:', convId, message)}
-          />
-        );
-      case 'billing':
-        return (
-          <BillingPage
-            bills={[]}
-            insurance={null}
-            onBack={() => setScreen('dashboard')}
-            onPayBill={(bill) => console.log('Pay bill:', bill)}
-            onViewClaim={(claim) => console.log('View claim:', claim)}
-          />
-        );
-      case 'healthRecords':
-        return (
-          <HealthRecordsPage
-            healthRecords={{}}
-            onBack={() => setScreen('dashboard')}
-            onDownloadRecord={() => console.log('Download record')}
-          />
-        );
-      case 'findFamilyDoctor':
-        return (
-          <FindFamilyDoctorPage
-            user={user}
-            onBack={() => setScreen('dashboard')}
-            onNavigate={handleNavigate}
-          />
-        );
-      case 'familyAccess':
-        return (
-          <FamilyAccessPage
-            familyMembers={[]}
-            onBack={() => setScreen('dashboard')}
-            onInvite={(data) => console.log('Invite:', data)}
-            onRemove={(id) => console.log('Remove:', id)}
-            onUpdatePermissions={(id, perms) => console.log('Update permissions:', id, perms)}
-          />
-        );
-      case 'shareRecords':
-        return (
-          <ShareRecordsPage
-            sharedLinks={[]}
-            onBack={() => setScreen('dashboard')}
-            onCreateLink={(data) => console.log('Create link:', data)}
-            onRevokeLink={(id) => console.log('Revoke link:', id)}
-          />
-        );
       case 'profile':
       case 'editProfile':
-        return (
-          <ProfilePage
-            user={user}
-            onBack={() => setScreen('dashboard')}
-            onSave={(data) => {
-              console.log('Save profile:', data);
-              setUser(prev => ({ ...prev, ...data }));
-            }}
-            onSignOut={handleSignOut}
-          />
-        );
       case 'emergencyContacts':
       case 'records':
       case 'documents':
+      case 'notifications':
         return <PlaceholderScreen title={SCREEN_NAMES[screen] || screen} onBack={() => setScreen('dashboard')} />;
       default:
-        return (
-          <LandingPage 
-            onGetStarted={() => setScreen('createAccount')} 
-            onSignIn={() => setScreen('login')}
-            onFindKiosk={() => setScreen('kiosks')}
-            onERorKiosk={() => setScreen('erOrKiosk')}
-          />
-        );
+        return <LandingPage onGetStarted={() => setScreen('createAccount')} onSignIn={() => setScreen('login')} />;
     }
   };
 
@@ -2167,7 +1936,7 @@ export default function ExtendiHealthApp() {
   const showAppShell = user && !noShellScreens.includes(screen);
 
   return (
-    <RealtimeProvider userId={user?.id}>
+    <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -2219,6 +1988,6 @@ export default function ExtendiHealthApp() {
         lockoutEndTime={pinVerification.lockoutEndTime}
         user={user}
       />
-    </RealtimeProvider>
+    </>
   );
 }
